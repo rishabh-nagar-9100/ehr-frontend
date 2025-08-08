@@ -1,0 +1,46 @@
+/* src/components/PatientTable.css */
+.patient-table {
+  /* Basic table styling */
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden; /* Ensures rounded corners are visible */
+}
+
+.patient-table thead tr {
+  /* Header row styling */
+  background-color: #0d6efd;
+  color: #fff;
+  text-align: left;
+}
+
+.patient-table th,
+.patient-table td {
+  /* Cell padding and border */
+  padding: 12px 15px;
+  border-bottom: 1px solid #dddddd;
+}
+
+.patient-table th {
+  /* Specific header cell styling */
+  font-weight: bold;
+}
+
+.patient-table tbody tr:nth-of-type(even) {
+  /* Alternating row colors for readability */
+  background-color: #f3f3f3;
+}
+
+.patient-table tbody tr:last-of-type {
+  /* Remove border from last row */
+  border-bottom: none;
+}
+
+.patient-table tbody tr:hover {
+  /* Hover effect for interactive feedback */
+  background-color: #e9ecef;
+  cursor: pointer;
+}

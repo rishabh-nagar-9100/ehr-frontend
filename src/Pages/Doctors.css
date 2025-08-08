@@ -1,0 +1,7 @@
+/* src/components/Doctors.css */
+
+.doctors-heading {
+  font-size: 1.5rem; /* Equivalent to text-2xl */
+  font-weight: 700;  /* Equivalent to font-bold */
+  margin-bottom: 1rem; /* Equivalent to mb-4 */
+}

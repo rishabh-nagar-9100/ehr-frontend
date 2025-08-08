@@ -1,0 +1,12 @@
+/* src/components/Appointments.css */
+
+.appointments-heading {
+  font-size: 1.5rem; /* Equivalent to text-2xl */
+  font-weight: 700;  /* Equivalent to font-bold */
+  margin-bottom: 1rem; /* Equivalent to mb-4 */
+}
+
+.appointments-paragraph {
+  /* No specific styles were applied to the paragraph */
+  /* You can add styles here if needed, e.g., color: #555; */
+}

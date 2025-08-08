@@ -1,0 +1,6 @@
+/* src/components/HealthChart.css */
+.health-chart-container {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+}

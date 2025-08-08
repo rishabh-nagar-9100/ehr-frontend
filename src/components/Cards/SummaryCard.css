@@ -1,0 +1,85 @@
+/* src/components/SummaryCard.css */
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #f0f7ff;
+  color: #3498db;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.summary-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-card p {
+  margin: 0.5rem 0 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* Color variants - optional */
+.summary-card.primary .card-icon {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.summary-card.success .card-icon {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.summary-card.warning .card-icon {
+  background-color: #fff8e1;
+  color: #ffa000;
+}
+
+.summary-card.danger .card-icon {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .summary-card {
+    gap: 1rem;
+    padding: 1.2rem;
+  }
+  
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .summary-card p {
+    font-size: 1.5rem;
+  }
+}

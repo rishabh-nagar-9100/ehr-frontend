@@ -1,0 +1,40 @@
+/* src/components/Login.css */
+
+.login-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+}
+
+.login-form {
+  background-color: #ffffff; /* Equivalent to bg-white */
+  padding: 1.5rem; /* Equivalent to p-6 */
+  border-radius: 0.5rem; /* Equivalent to rounded */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Equivalent to shadow-md */
+  width: 20rem; /* Equivalent to w-80 */
+}
+
+.login-title {
+  font-size: 1.25rem; /* Equivalent to text-xl */
+  font-weight: 700; /* Equivalent to font-bold */
+  margin-bottom: 1rem; /* Equivalent to mb-4 */
+}
+
+.login-input {
+  border: 1px solid #d1d5db; /* Equivalent to border */
+  width: 100%; /* Equivalent to w-full */
+  padding: 0.5rem; /* Equivalent to p-2 */
+  margin-bottom: 0.75rem; /* Equivalent to mb-3 */
+}
+
+.login-button {
+  background-color: #3b82f6; /* Equivalent to bg-blue-500 */
+  color: #ffffff; /* Equivalent to text-white */
+  padding: 0.5rem; /* Equivalent to p-2 */
+  width: 100%; /* Equivalent to w-full */
+  border-radius: 0.25rem; /* Equivalent to rounded */
+  border: none;
+  cursor: pointer;
+}

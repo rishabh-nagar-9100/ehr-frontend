@@ -1,0 +1,73 @@
+/* src/components/AppointmentForm.css */
+.appointment-form {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.appointment-form h3 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.appointment-form input,
+.appointment-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.appointment-form input:focus,
+.appointment-form textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.appointment-form input[type="date"],
+.appointment-form input[type="time"] {
+  padding: 11px;
+}
+
+.appointment-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.appointment-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.appointment-form button:hover {
+  background-color: #2980b9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .appointment-form {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .appointment-form h3 {
+    font-size: 1.5rem;
+  }
+}
