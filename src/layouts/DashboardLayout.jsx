@@ -1,23 +1,27 @@
 import React from "react";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/sidebar/sidebar";
+import Navbar from "../components/Navbar/Navbar";
 import { useAuth } from "../context/AuthContext";
+import "./DashboardLayout.css";
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayout = () => {
   const { user } = useAuth(); // get logged-in user & role
 
   return (
-    <div className="dashboard-layout flex h-screen bg-gray-100">
+    <div className="dashboard-layout">
       {/* Sidebar */}
       <Sidebar role={user?.role} />
 
       {/* Main area */}
-      <div className="flex flex-col flex-1">
+      <div className="main-content">
         {/* Top Navbar */}
         <Navbar />
 
         {/* Content Area */}
-        <main className="p-4 overflow-y-auto">{children}</main>
+        <main className="content-area">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

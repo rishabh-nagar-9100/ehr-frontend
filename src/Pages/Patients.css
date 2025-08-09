@@ -1,5 +1,5 @@
-/* Doctors Page Styles */
-.doctors-page {
+/* Patients Page Styles */
+.patients-page {
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
@@ -8,7 +8,7 @@
   color: white;
 }
 
-.doctors-header {
+.patients-header {
   margin-bottom: 2rem;
 }
 
@@ -25,7 +25,7 @@
   margin-bottom: 1.5rem;
 }
 
-.doctors-stats {
+.patients-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
@@ -62,7 +62,7 @@
 }
 
 /* Controls */
-.doctors-controls {
+.patients-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -127,7 +127,7 @@
   color: white;
 }
 
-.add-doctor-btn {
+.add-patient-btn {
   background: linear-gradient(135deg, #ffd700, #ffed4e);
   color: #333;
   border: none;
@@ -140,13 +140,13 @@
   white-space: nowrap;
 }
 
-.add-doctor-btn:hover {
+.add-patient-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
 }
 
 /* Tabs */
-.doctors-tabs {
+.patients-tabs {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
@@ -177,8 +177,8 @@
   box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
 }
 
-/* Doctors List */
-.doctors-list {
+/* Patients List */
+.patients-list {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 15px;
   padding: 2rem;
@@ -189,7 +189,7 @@
   gap: 1.5rem;
 }
 
-.doctor-card {
+.patient-card {
   background: white;
   border-radius: 15px;
   padding: 1.5rem;
@@ -199,12 +199,12 @@
   cursor: pointer;
 }
 
-.doctor-card:hover {
+.patient-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-.doctor-header {
+.patient-header {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
@@ -212,7 +212,7 @@
   border-bottom: 2px solid #f0f0f0;
 }
 
-.doctor-avatar {
+.patient-avatar {
   width: 60px;
   height: 60px;
   background: linear-gradient(135deg, #667eea, #764ba2);
@@ -226,24 +226,17 @@
   margin-right: 1rem;
 }
 
-.doctor-basic-info {
+.patient-basic-info {
   flex: 1;
 }
 
-.doctor-basic-info h3 {
+.patient-basic-info h3 {
   margin: 0 0 0.5rem 0;
   color: #333;
   font-size: 1.4rem;
 }
 
-.doctor-specialization {
-  margin: 0 0 0.3rem 0;
-  color: #667eea;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.doctor-department {
+.patient-details {
   margin: 0;
   color: #666;
   font-size: 0.9rem;
@@ -259,35 +252,7 @@
   letter-spacing: 0.5px;
 }
 
-.doctor-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 10px;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-label {
-  display: block;
-  font-size: 0.8rem;
-  color: #666;
-  margin-bottom: 0.3rem;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.doctor-info {
+.patient-info {
   margin-bottom: 1rem;
 }
 
@@ -302,7 +267,7 @@
 .info-row .label {
   font-weight: 600;
   color: #555;
-  min-width: 120px;
+  min-width: 140px;
 }
 
 .info-row .value {
@@ -310,7 +275,37 @@
   font-weight: 500;
 }
 
-.doctor-actions {
+.value.next-appointment {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+}
+
+.patient-medical-summary {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.medical-item {
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.medical-item:last-child {
+  margin-bottom: 0;
+}
+
+.medical-item strong {
+  color: #333;
+}
+
+.patient-actions {
   display: flex;
   gap: 0.8rem;
   flex-wrap: wrap;
@@ -333,14 +328,14 @@
   color: white;
 }
 
-.schedule-btn {
-  background: linear-gradient(135deg, #28a745, #20c997);
+.edit-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
 }
 
-.manage-btn {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-  color: #333;
+.appointment-btn {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
 }
 
 .action-btn:hover {
@@ -348,19 +343,19 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* No Doctors */
-.no-doctors {
+/* No Patients */
+.no-patients {
   text-align: center;
   padding: 3rem;
   color: #666;
 }
 
-.no-doctors-icon {
+.no-patients-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
 }
 
-.no-doctors h3 {
+.no-patients h3 {
   margin-bottom: 0.5rem;
   color: #333;
 }
@@ -380,7 +375,7 @@
   padding: 1rem;
 }
 
-.doctor-modal, .add-doctor-modal {
+.patient-modal, .add-patient-modal {
   background: white;
   border-radius: 20px;
   max-width: 900px;
@@ -428,7 +423,7 @@
   color: #333;
 }
 
-.doctor-details-grid {
+.patient-details-grid {
   display: grid;
   gap: 2rem;
 }
@@ -462,19 +457,8 @@
 .detail-item strong {
   color: #555;
   margin-right: 0.5rem;
-  min-width: 150px;
+  min-width: 120px;
   display: inline-block;
-}
-
-.bio-section {
-  margin-top: 1rem;
-}
-
-.bio-section p {
-  margin: 0.5rem 0 0 0;
-  color: #555;
-  line-height: 1.5;
-  font-style: italic;
 }
 
 .modal-actions {
@@ -496,22 +480,17 @@
   min-width: 150px;
 }
 
-.modal-action-btn.schedule-btn {
-  background: linear-gradient(135deg, #28a745, #20c997);
-  color: white;
-}
-
-.modal-action-btn.message-btn {
+.modal-action-btn.edit-btn {
   background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
 }
 
-.modal-action-btn.edit-btn {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-  color: #333;
+.modal-action-btn.appointment-btn {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
 }
 
-.modal-action-btn.manage-btn {
+.modal-action-btn.records-btn {
   background: linear-gradient(135deg, #17a2b8, #138496);
   color: white;
 }
@@ -521,8 +500,8 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* Add Doctor Form */
-.add-doctor-form {
+/* Add Patient Form */
+.add-patient-form {
   padding: 2rem;
   color: #333;
 }
@@ -563,7 +542,7 @@
 
 .form-textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 80px;
 }
 
 .form-actions {
@@ -593,15 +572,15 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .doctors-page {
+  .patients-page {
     padding: 1rem;
   }
   
-  .doctors-stats {
+  .patients-stats {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .doctors-controls {
+  .patients-controls {
     flex-direction: column;
     align-items: stretch;
   }
@@ -610,7 +589,7 @@
     min-width: auto;
   }
   
-  .doctors-tabs {
+  .patients-tabs {
     flex-direction: column;
   }
   
@@ -618,17 +597,13 @@
     text-align: center;
   }
   
-  .doctor-header {
+  .patient-header {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
   
-  .doctor-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .doctor-actions {
+  .patient-actions {
     flex-direction: column;
   }
   
@@ -660,20 +635,16 @@
     font-size: 2rem;
   }
   
-  .doctors-stats {
+  .patients-stats {
     grid-template-columns: 1fr;
   }
   
-  .doctor-modal, .add-doctor-modal {
+  .patient-modal, .add-patient-modal {
     margin: 0.5rem;
     max-height: 95vh;
   }
   
   .modal-header, .modal-content, .modal-actions {
     padding: 1rem;
-  }
-  
-  .doctor-stats {
-    grid-template-columns: 1fr;
   }
 }
