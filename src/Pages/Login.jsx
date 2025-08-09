@@ -6,26 +6,39 @@ import "./Login.css";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("patient");
+  const [error, setError] = useState("");
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Extract username from email for demo purposes
-    const username = email.split('@')[0] || "User";
-    // Call login with correct parameters (username, role)
-    login(username, role);
-    // Navigate after login
-    setTimeout(() => {
+    setError("");
+    
+    try {
+      await login(email, password);
       navigate("/");
-    }, 1000);
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    }
   };
 
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
-        <h2 className="login-title">Login to EHR System</h2>
+        <h2 className="login-title">Login to MediSync</h2>
+        
+        {error && (
+          <div className="error-message" style={{ 
+            color: 'red', 
+            marginBottom: '1rem', 
+            padding: '0.5rem',
+            backgroundColor: '#ffebee',
+            border: '1px solid #ffcdd2',
+            borderRadius: '4px'
+          }}>
+            {error}
+          </div>
+        )}
         
         <div className="form-group">
           <input
@@ -49,19 +62,6 @@ const Login = () => {
           />
         </div>
         
-        <div className="form-group">
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="form-input"
-          >
-            <option value="patient">Patient</option>
-            <option value="doctor">Doctor</option>
-            <option value="hospitalOwner">Hospital Owner</option>
-            <option value="staff">Staff</option>
-          </select>
-        </div>
-        
         <button
           type="submit"
           className="login-button"
@@ -69,6 +69,10 @@ const Login = () => {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+        
+        <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: '#666' }}>
+          Don't have an account? <a href="/register" style={{ color: '#007bff' }}>Register here</a>
+        </div>
       </form>
     </div>
   );

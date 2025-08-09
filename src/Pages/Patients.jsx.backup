@@ -1,0 +1,967 @@
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { usePatients } from "../hooks/useApi";
+import "./Patients.css";
+
+const Patients = () => {
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [newPatientForm, setNewPatientForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "Male",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "USA"
+    },
+    emergencyContact: {
+      name: "",
+      relationship: "",
+      phone: ""
+    },
+    bloodType: "",
+    allergies: [],
+    medications: [],
+    medicalHistory: ""
+  });
+
+  const { patients, loading, error, addPatient, updatePatient, deletePatient } = usePatients(searchTerm);
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setNewPatientForm(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }));
+    } else {
+      setNewPatientForm(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (selectedPatient) {
+        await updatePatient(selectedPatient._id, newPatientForm);
+      } else {
+        await addPatient(newPatientForm);
+      }
+      setShowAddModal(false);
+      setSelectedPatient(null);
+      setNewPatientForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dateOfBirth: "",
+        gender: "Male",
+        address: {
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          country: "USA"
+        },
+        emergencyContact: {
+          name: "",
+          relationship: "",
+          phone: ""
+        },
+        bloodType: "",
+        allergies: [],
+        medications: [],
+        medicalHistory: ""
+      });
+    } catch (err) {
+      alert('Error saving patient: ' + err.message);
+    }
+  };
+
+  const handleEdit = (patient) => {
+    setSelectedPatient(patient);
+    setNewPatientForm({
+      firstName: patient.firstName || "",
+      lastName: patient.lastName || "",
+      email: patient.email || "",
+      phone: patient.phone || "",
+      dateOfBirth: patient.dateOfBirth ? patient.dateOfBirth.split('T')[0] : "",
+      gender: patient.gender || "Male",
+      address: patient.address || {
+        street: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        country: "USA"
+      },
+      emergencyContact: patient.emergencyContact || {
+        name: "",
+        relationship: "",
+        phone: ""
+      },
+      bloodType: patient.bloodType || "",
+      allergies: patient.allergies || [],
+      medications: patient.medications || [],
+      medicalHistory: patient.medicalHistory || ""
+    });
+    setShowAddModal(true);
+  };
+
+  const handleDelete = async (patientId) => {
+    if (window.confirm('Are you sure you want to delete this patient?')) {
+      try {
+        await deletePatient(patientId);
+      } catch (err) {
+        alert('Error deleting patient: ' + err.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="patients-page">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading patients...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="patients-page">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-red-500">Error loading patients: {error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="patients-page">
+      <div className="patients-header">
+        <h1 className="patients-title">Patient Management</h1>
+        <div className="patients-controls">
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search patients..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          {(user?.role === 'doctor' || user?.role === 'hospitalOwner' || user?.role === 'staff') && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="add-patient-btn"
+            >
+              + Add Patient
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="patients-list">
+        {patients && patients.length > 0 ? (
+          <div className="patients-grid">
+            {patients.map((patient) => (
+              <div key={patient._id} className="patient-card">
+                <div className="patient-header">
+                  <div className="patient-avatar">
+                    {patient.firstName?.[0]}{patient.lastName?.[0]}
+                  </div>
+                  <div className="patient-info">
+                    <h3>{patient.firstName} {patient.lastName}</h3>
+                    <p className="patient-email">{patient.email}</p>
+                    <p className="patient-phone">{patient.phone}</p>
+                  </div>
+                </div>
+                
+                <div className="patient-details">
+                  <div className="detail-row">
+                    <span className="detail-label">DOB:</span>
+                    <span>{formatDate(patient.dateOfBirth)}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Gender:</span>
+                    <span>{patient.gender}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Blood Type:</span>
+                    <span>{patient.bloodType || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Age:</span>
+                    <span>{patient.age || 'N/A'}</span>
+                  </div>
+                </div>
+
+                {(user?.role === 'doctor' || user?.role === 'hospitalOwner' || user?.role === 'staff') && (
+                  <div className="patient-actions">
+                    <button
+                      onClick={() => handleEdit(patient)}
+                      className="edit-btn"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(patient._id)}
+                      className="delete-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-patients">
+            <p>No patients found.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Add/Edit Patient Modal */}
+      {showAddModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>{selectedPatient ? 'Edit Patient' : 'Add New Patient'}</h2>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setSelectedPatient(null);
+                  resetForm();
+                }}
+                className="close-btn"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="patient-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={newPatientForm.firstName}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={newPatientForm.lastName}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={newPatientForm.email}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Phone</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={newPatientForm.phone}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Date of Birth</label>
+                  <input
+                    type="date"
+                    name="dateOfBirth"
+                    value={newPatientForm.dateOfBirth}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Gender</label>
+                  <select
+                    name="gender"
+                    value={newPatientForm.gender}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Blood Type</label>
+                  <select
+                    name="bloodType"
+                    value={newPatientForm.bloodType}
+                    onChange={handleFormChange}
+                  >
+                    <option value="">Select Blood Type</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Street Address</label>
+                  <input
+                    type="text"
+                    name="address.street"
+                    value={newPatientForm.address.street}
+                    onChange={handleFormChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>City</label>
+                  <input
+                    type="text"
+                    name="address.city"
+                    value={newPatientForm.address.city}
+                    onChange={handleFormChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>State</label>
+                  <input
+                    type="text"
+                    name="address.state"
+                    value={newPatientForm.address.state}
+                    onChange={handleFormChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Emergency Contact Name</label>
+                  <input
+                    type="text"
+                    name="emergencyContact.name"
+                    value={newPatientForm.emergencyContact.name}
+                    onChange={handleFormChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Emergency Contact Phone</label>
+                  <input
+                    type="tel"
+                    name="emergencyContact.phone"
+                    value={newPatientForm.emergencyContact.phone}
+                    onChange={handleFormChange}
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Medical History</label>
+                  <textarea
+                    name="medicalHistory"
+                    value={newPatientForm.medicalHistory}
+                    onChange={handleFormChange}
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button type="submit" className="save-btn">
+                  {selectedPatient ? 'Update Patient' : 'Add Patient'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setSelectedPatient(null);
+                    resetForm();
+                  }}
+                  className="cancel-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString();
+  };
+      status: "Inactive",
+      emergencyContact: "Mary Wilson - +1 (555) 654-3210",
+      allergies: "Latex, Codeine",
+      medications: "Warfarin 5mg, Metoprolol 25mg",
+      medicalHistory: "Atrial Fibrillation, Stroke (2020)",
+      avatar: "RW"
+    },
+    {
+      id: 5,
+      firstName: "Sarah",
+      lastName: "Martinez",
+      email: "sarah.martinez@email.com",
+      phone: "+1 (555) 567-8901",
+      dateOfBirth: "1988-09-14",
+      gender: "Female",
+      address: "654 Maple Ln, Anywhere, USA",
+      bloodType: "O+",
+      lastVisit: "2025-08-03",
+      nextAppointment: "2025-08-18",
+      status: "Active",
+      emergencyContact: "Carlos Martinez - +1 (555) 543-2109",
+      allergies: "Sulfa drugs",
+      medications: "Levothyroxine 50mcg",
+      medicalHistory: "Hypothyroidism",
+      avatar: "SM"
+    }
+  ];
+
+  const recentPatients = allPatients.filter(patient => {
+    const lastVisitDate = new Date(patient.lastVisit);
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return lastVisitDate >= oneWeekAgo;
+  });
+
+  const criticalPatients = allPatients.filter(patient => 
+    patient.medicalHistory.includes("Diabetes") || 
+    patient.medicalHistory.includes("Hypertension") ||
+    patient.medicalHistory.includes("Stroke") ||
+    patient.medicalHistory.includes("Atrial Fibrillation")
+  );
+
+  const handleAddPatient = (e) => {
+    e.preventDefault();
+    console.log("Adding new patient:", newPatientForm);
+    setShowAddModal(false);
+    // Reset form
+    setNewPatientForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      dateOfBirth: "",
+      gender: "",
+      address: "",
+      emergencyContact: "",
+      bloodType: "",
+      allergies: "",
+      medications: "",
+      medicalHistory: ""
+    });
+  };
+
+  const getFilteredPatients = () => {
+    let patients = [];
+    
+    switch (activeTab) {
+      case "all":
+        patients = allPatients;
+        break;
+      case "recent":
+        patients = recentPatients;
+        break;
+      case "critical":
+        patients = criticalPatients;
+        break;
+      default:
+        patients = allPatients;
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      patients = patients.filter(patient =>
+        `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        patient.phone.includes(searchTerm)
+      );
+    }
+
+    // Apply status filter
+    if (filterBy !== "all") {
+      patients = patients.filter(patient => patient.status.toLowerCase() === filterBy);
+    }
+
+    return patients;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Active": return "#28a745";
+      case "Inactive": return "#6c757d";
+      case "Critical": return "#dc3545";
+      default: return "#6c757d";
+    }
+  };
+
+  const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
+  const renderPatientCard = (patient) => (
+    <div key={patient.id} className="patient-card" onClick={() => setSelectedPatient(patient)}>
+      <div className="patient-header">
+        <div className="patient-avatar">
+          <span>{patient.avatar}</span>
+        </div>
+        <div className="patient-basic-info">
+          <h3>{patient.firstName} {patient.lastName}</h3>
+          <p className="patient-details">
+            👤 {calculateAge(patient.dateOfBirth)} years • {patient.gender} • 🩸 {patient.bloodType}
+          </p>
+        </div>
+        <span 
+          className="status-badge" 
+          style={{ backgroundColor: getStatusColor(patient.status) }}
+        >
+          {patient.status}
+        </span>
+      </div>
+      
+      <div className="patient-info">
+        <div className="info-row">
+          <span className="label">📧 Email:</span>
+          <span className="value">{patient.email}</span>
+        </div>
+        <div className="info-row">
+          <span className="label">📱 Phone:</span>
+          <span className="value">{patient.phone}</span>
+        </div>
+        <div className="info-row">
+          <span className="label">📅 Last Visit:</span>
+          <span className="value">{patient.lastVisit}</span>
+        </div>
+        {patient.nextAppointment && (
+          <div className="info-row">
+            <span className="label">🔜 Next Appointment:</span>
+            <span className="value next-appointment">{patient.nextAppointment}</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="patient-medical-summary">
+        {patient.allergies !== "None known" && (
+          <div className="medical-item">
+            <strong>⚠️ Allergies:</strong> {patient.allergies}
+          </div>
+        )}
+        {patient.medications && (
+          <div className="medical-item">
+            <strong>💊 Medications:</strong> {patient.medications}
+          </div>
+        )}
+      </div>
+      
+      <div className="patient-actions">
+        <button className="action-btn view-btn">👁️ View Profile</button>
+        <button className="action-btn edit-btn">✏️ Edit</button>
+        <button className="action-btn appointment-btn">📅 Schedule</button>
+      </div>
+    </div>
+  );
+
+  const renderPatientModal = () => (
+    selectedPatient && (
+      <div className="modal-overlay" onClick={() => setSelectedPatient(null)}>
+        <div className="patient-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>👤 {selectedPatient.firstName} {selectedPatient.lastName}</h2>
+            <button className="close-btn" onClick={() => setSelectedPatient(null)}>✕</button>
+          </div>
+          
+          <div className="modal-content">
+            <div className="patient-details-grid">
+              <div className="detail-section">
+                <h4>📋 Personal Information</h4>
+                <div className="detail-item">
+                  <strong>Full Name:</strong> {selectedPatient.firstName} {selectedPatient.lastName}
+                </div>
+                <div className="detail-item">
+                  <strong>Age:</strong> {calculateAge(selectedPatient.dateOfBirth)} years
+                </div>
+                <div className="detail-item">
+                  <strong>Gender:</strong> {selectedPatient.gender}
+                </div>
+                <div className="detail-item">
+                  <strong>Blood Type:</strong> {selectedPatient.bloodType}
+                </div>
+                <div className="detail-item">
+                  <strong>Date of Birth:</strong> {selectedPatient.dateOfBirth}
+                </div>
+              </div>
+              
+              <div className="detail-section">
+                <h4>📞 Contact Information</h4>
+                <div className="detail-item">
+                  <strong>Email:</strong> {selectedPatient.email}
+                </div>
+                <div className="detail-item">
+                  <strong>Phone:</strong> {selectedPatient.phone}
+                </div>
+                <div className="detail-item">
+                  <strong>Address:</strong> {selectedPatient.address}
+                </div>
+                <div className="detail-item">
+                  <strong>Emergency Contact:</strong> {selectedPatient.emergencyContact}
+                </div>
+              </div>
+              
+              <div className="detail-section">
+                <h4>🏥 Medical Information</h4>
+                <div className="detail-item">
+                  <strong>Allergies:</strong> {selectedPatient.allergies}
+                </div>
+                <div className="detail-item">
+                  <strong>Current Medications:</strong> {selectedPatient.medications}
+                </div>
+                <div className="detail-item">
+                  <strong>Medical History:</strong> {selectedPatient.medicalHistory}
+                </div>
+                <div className="detail-item">
+                  <strong>Last Visit:</strong> {selectedPatient.lastVisit}
+                </div>
+                {selectedPatient.nextAppointment && (
+                  <div className="detail-item">
+                    <strong>Next Appointment:</strong> {selectedPatient.nextAppointment}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="modal-actions">
+            <button className="modal-action-btn edit-btn">✏️ Edit Patient</button>
+            <button className="modal-action-btn appointment-btn">📅 Schedule Appointment</button>
+            <button className="modal-action-btn records-btn">📋 View Records</button>
+          </div>
+        </div>
+      </div>
+    )
+  );
+
+  const renderAddPatientModal = () => (
+    showAddModal && (
+      <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+        <div className="add-patient-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>➕ Add New Patient</h2>
+            <button className="close-btn" onClick={() => setShowAddModal(false)}>✕</button>
+          </div>
+          
+          <form onSubmit={handleAddPatient} className="add-patient-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                  type="text"
+                  value={newPatientForm.firstName}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, firstName: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  value={newPatientForm.lastName}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, lastName: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>📧 Email</label>
+                <input
+                  type="email"
+                  value={newPatientForm.email}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, email: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>📱 Phone</label>
+                <input
+                  type="tel"
+                  value={newPatientForm.phone}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, phone: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>📅 Date of Birth</label>
+                <input
+                  type="date"
+                  value={newPatientForm.dateOfBirth}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, dateOfBirth: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>⚥ Gender</label>
+                <select
+                  value={newPatientForm.gender}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, gender: e.target.value})}
+                  className="form-input"
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>🩸 Blood Type</label>
+                <select
+                  value={newPatientForm.bloodType}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, bloodType: e.target.value})}
+                  className="form-input"
+                  required
+                >
+                  <option value="">Select Blood Type</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>🚨 Emergency Contact</label>
+                <input
+                  type="text"
+                  value={newPatientForm.emergencyContact}
+                  onChange={(e) => setNewPatientForm({...newPatientForm, emergencyContact: e.target.value})}
+                  className="form-input"
+                  placeholder="Name - Phone"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>🏠 Address</label>
+              <textarea
+                value={newPatientForm.address}
+                onChange={(e) => setNewPatientForm({...newPatientForm, address: e.target.value})}
+                className="form-textarea"
+                rows="2"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>⚠️ Allergies</label>
+              <input
+                type="text"
+                value={newPatientForm.allergies}
+                onChange={(e) => setNewPatientForm({...newPatientForm, allergies: e.target.value})}
+                className="form-input"
+                placeholder="e.g., Penicillin, Peanuts (or 'None known')"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>💊 Current Medications</label>
+              <textarea
+                value={newPatientForm.medications}
+                onChange={(e) => setNewPatientForm({...newPatientForm, medications: e.target.value})}
+                className="form-textarea"
+                rows="2"
+                placeholder="List current medications and dosages"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>🏥 Medical History</label>
+              <textarea
+                value={newPatientForm.medicalHistory}
+                onChange={(e) => setNewPatientForm({...newPatientForm, medicalHistory: e.target.value})}
+                className="form-textarea"
+                rows="3"
+                placeholder="Significant medical conditions and history"
+              />
+            </div>
+            
+            <div className="form-actions">
+              <button type="submit" className="submit-btn">
+                ➕ Add Patient
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  );
+
+  return (
+    <div className="patients-page">
+      <div className="patients-header">
+        <div className="header-content">
+          <h1>👥 Patients</h1>
+          <p>Manage patient records and information</p>
+        </div>
+        
+        <div className="patients-stats">
+          <div className="stat-card">
+            <div className="stat-number">{allPatients.length}</div>
+            <div className="stat-label">Total Patients</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{allPatients.filter(p => p.status === "Active").length}</div>
+            <div className="stat-label">Active</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{recentPatients.length}</div>
+            <div className="stat-label">Recent Visits</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{criticalPatients.length}</div>
+            <div className="stat-label">Critical Care</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="patients-controls">
+        <div className="search-and-filter">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="🔍 Search patients by name, email, or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          
+          <select
+            value={filterBy}
+            onChange={(e) => setFilterBy(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive Only</option>
+          </select>
+        </div>
+        
+        <button 
+          className="add-patient-btn"
+          onClick={() => setShowAddModal(true)}
+        >
+          ➕ Add New Patient
+        </button>
+      </div>
+
+      <div className="patients-tabs">
+        <button 
+          className={`tab-btn ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          👥 All Patients ({allPatients.length})
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === "recent" ? "active" : ""}`}
+          onClick={() => setActiveTab("recent")}
+        >
+          🕐 Recent Visits ({recentPatients.length})
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === "critical" ? "active" : ""}`}
+          onClick={() => setActiveTab("critical")}
+        >
+          🚨 Critical Care ({criticalPatients.length})
+        </button>
+      </div>
+
+      <div className="patients-list">
+        {getFilteredPatients().length > 0 ? (
+          getFilteredPatients().map(patient => renderPatientCard(patient))
+        ) : (
+          <div className="no-patients">
+            <div className="no-patients-icon">👥</div>
+            <h3>No Patients Found</h3>
+            <p>No patients match your current search criteria.</p>
+          </div>
+        )}
+      </div>
+
+      {renderPatientModal()}
+      {renderAddPatientModal()}
+    </div>
+  );
+};
+
+export default Patients;

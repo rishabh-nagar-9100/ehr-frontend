@@ -1,46 +1,103 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HealthChart from "../components/Charts/HealthChart";
 import { useAuth } from "../context/AuthContext";
+import { useDashboard } from "../hooks/useApi";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { stats, recentPatients, todayAppointments, loading, error } = useDashboard();
 
-  // Dynamic data based on user role
+  // Dynamic data based on user role and API data
   const getDashboardData = () => {
+    if (!stats) {
+      // Default data while loading
+      switch (user?.role) {
+        case "doctor":
+          return [
+            { title: "My Patients", value: "...", icon: "👥" },
+            { title: "Today's Appointments", value: "...", icon: "📅" },
+            { title: "Pending Reviews", value: "...", icon: "📋" },
+            { title: "Completed Checkups", value: "...", icon: "✅" },
+          ];
+        case "hospitalOwner":
+          return [
+            { title: "Total Patients", value: "...", icon: "👥" },
+            { title: "Total Doctors", value: "...", icon: "�‍⚕️" },
+            { title: "Total Staff", value: "...", icon: "👥" },
+            { title: "Today's Appointments", value: "...", icon: "📅" },
+          ];
+        case "staff":
+          return [
+            { title: "Total Patients", value: "...", icon: "📝" },
+            { title: "Today's Appointments", value: "...", icon: "📅" },
+            { title: "Pending Tasks", value: "...", icon: "⏳" },
+            { title: "Completed Tasks", value: "...", icon: "✅" },
+          ];
+        default: // patient
+          return [
+            { title: "Upcoming Appointments", value: "...", icon: "📅" },
+            { title: "Health Reports", value: "...", icon: "📋" },
+            { title: "Prescriptions", value: "...", icon: "💊" },
+            { title: "Health Score", value: "...", icon: "❤️" },
+          ];
+      }
+    }
+
+    // Real data from API
     switch (user?.role) {
       case "doctor":
         return [
-          { title: "My Patients", value: 45, icon: "👥" },
-          { title: "Today's Appointments", value: 12, icon: "📅" },
-          { title: "Pending Reviews", value: 7, icon: "📋" },
-          { title: "Completed Checkups", value: 23, icon: "✅" },
+          { title: "My Patients", value: stats.totalPatients || 0, icon: "👥" },
+          { title: "Today's Appointments", value: stats.todayAppointments || 0, icon: "📅" },
+          { title: "Upcoming Appointments", value: stats.upcomingAppointments || 0, icon: "📋" },
+          { title: "Completed Appointments", value: stats.completedAppointments || 0, icon: "✅" },
         ];
       case "hospitalOwner":
         return [
-          { title: "Total Revenue", value: "$125K", icon: "💰" },
-          { title: "Total Staff", value: 85, icon: "👥" },
-          { title: "Departments", value: 12, icon: "🏥" },
-          { title: "Monthly Growth", value: "+15%", icon: "📈" },
+          { title: "Total Patients", value: stats.totalPatients || 0, icon: "�" },
+          { title: "Total Doctors", value: stats.totalDoctors || 0, icon: "👨‍⚕️" },
+          { title: "Total Staff", value: stats.totalStaff || 0, icon: "👥" },
+          { title: "Today's Appointments", value: stats.todayAppointments || 0, icon: "�" },
         ];
       case "staff":
         return [
-          { title: "Registered Patients", value: 28, icon: "📝" },
-          { title: "Reports Uploaded", value: 15, icon: "📤" },
-          { title: "Pending Tasks", value: 5, icon: "⏳" },
-          { title: "Completed Tasks", value: 42, icon: "✅" },
+          { title: "Total Patients", value: stats.totalPatients || 0, icon: "📝" },
+          { title: "Today's Appointments", value: stats.todayAppointments || 0, icon: "📅" },
+          { title: "Upcoming Appointments", value: stats.upcomingAppointments || 0, icon: "⏳" },
+          { title: "Completed Appointments", value: stats.completedAppointments || 0, icon: "✅" },
         ];
       default: // patient
         return [
-          { title: "Upcoming Appointments", value: 2, icon: "📅" },
-          { title: "Health Reports", value: 8, icon: "📋" },
-          { title: "Prescriptions", value: 3, icon: "💊" },
-          { title: "Health Score", value: "85%", icon: "❤️" },
+          { title: "Upcoming Appointments", value: stats.upcomingAppointments || 0, icon: "📅" },
+          { title: "Total Appointments", value: stats.completedAppointments || 0, icon: "📋" },
+          { title: "Prescriptions", value: "0", icon: "💊" },
+          { title: "Health Score", value: "Good", icon: "❤️" },
         ];
     }
   };
 
   const dashboardCards = getDashboardData();
+
+  if (loading) {
+    return (
+      <div className="dashboard-page">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading dashboard...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-page">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-red-500">Error loading dashboard: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-page">
